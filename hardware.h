@@ -62,4 +62,4 @@
 #define ProtectTimerTune 52
 #define K1Tune 53
 
-#define SamplesCount 100 // примерно
+#define SamplesCount 100 // РїСЂРёРјРµСЂРЅРѕ
