@@ -1,5 +1,5 @@
-//программа для устройства защиты бытовой техники от превышения напряжения в сети
-//на основе Tiny26
+//РїСЂРѕРіСЂР°РјРјР° РґР»СЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° Р·Р°С‰РёС‚С‹ Р±С‹С‚РѕРІРѕР№ С‚РµС…РЅРёРєРё РѕС‚ РїСЂРµРІС‹С€РµРЅРёСЏ РЅР°РїСЂСЏР¶РµРЅРёСЏ РІ СЃРµС‚Рё
+//РЅР° РѕСЃРЅРѕРІРµ Tiny26
 
 #include <ioavr.h>
 #include <intrinsics.h>
@@ -24,10 +24,10 @@ unsigned char ProtectTimerOffValue;
 unsigned int Voltage;
 volatile unsigned int UpTreshold, DownTreshold;
 unsigned int DisplayedVoltage;
-volatile unsigned char DisplayMode = RealtimeVoltage, EnableDisplay = 128; // небольшая экономия кода
+volatile unsigned char DisplayMode = RealtimeVoltage, EnableDisplay = 128; // РЅРµР±РѕР»СЊС€Р°СЏ СЌРєРѕРЅРѕРјРёСЏ РєРѕРґР°
 
 volatile unsigned int PeakResult;
-volatile unsigned int Peak; // внутреннее значение
+volatile unsigned int Peak; // РІРЅСѓС‚СЂРµРЅРЅРµРµ Р·РЅР°С‡РµРЅРёРµ
 
 volatile unsigned char PlusSamplesCounter, ZeroSamplesCounter;
 
@@ -39,18 +39,18 @@ unsigned int K1; //500
 
 inline void __watchdog_init (void)
 {
-//запускаю сторожевой таймер на 2 секунды
+//Р·Р°РїСѓСЃРєР°СЋ СЃС‚РѕСЂРѕР¶РµРІРѕР№ С‚Р°Р№РјРµСЂ РЅР° 2 СЃРµРєСѓРЅРґС‹
 __watchdog_reset ();
 WDTCR |= ((1<<WDCE)|(1<<WDE));
 WDTCR = (1<<WDE)|(7<<WDP0);
 __watchdog_reset ();
 }
 
-void CharToStringDec(signed int inp) // обрезанная до сотен
+void CharToStringDec(signed int inp) // РѕР±СЂРµР·Р°РЅРЅР°СЏ РґРѕ СЃРѕС‚РµРЅ
 {
 unsigned char i;
 String[0]=String[1]=String[2]=0;
-// перевод
+// РїРµСЂРµРІРѕРґ
 for(i=0;i<3;)
   {
   if((inp-segmentsDec[i])>=0)
@@ -64,7 +64,7 @@ for(i=0;i<3;)
 
 inline void InitPorts (void)
 {
-PortButton |= (1<<Button_DN)|(1<<Button_UP); // подтягивающие резисторы
+PortButton |= (1<<Button_DN)|(1<<Button_UP); // РїРѕРґС‚СЏРіРёРІР°СЋС‰РёРµ СЂРµР·РёСЃС‚РѕСЂС‹
 
 PortAnodeDir |= ((1<<SEG_A)|(1<<SEG_B)|(1<<SEG_C)|(1<<SEG_D)|(1<<SEG_E)|(1<<SEG_F)|(1<<SEG_G)|(1<<SEG_DP));
 PortKathodeAndRelayDir |= ((1<<Kathode_1) | (1<<Kathode_2) | (1<<Kathode_3)|(1<<Relay));
@@ -75,8 +75,8 @@ inline void InitADC (void)
 ADMUX = ((2<<REFS0)|(InADC << MUX0));
 ADCSR = ((1 << ADEN)|(5 << ADPS0)|(0<<ADFR)|(0<<ADSC)|(0<<ADIE));
 
-//5 << ADPS0 Prescaler = 32  f = 8000000/(32*13)=19230 Гц
-//6 << ADPS0 Prescaler = 64  f = 8000000/(64*13)=9615 Гц
+//5 << ADPS0 Prescaler = 32  f = 8000000/(32*13)=19230 Р“С†
+//6 << ADPS0 Prescaler = 64  f = 8000000/(64*13)=9615 Р“С†
 //7 << ADPS0 Prescaler = 128
 }
 
@@ -161,7 +161,7 @@ if (EnableDisplay)
 __interrupt void ADCSampleReady (void)
 {
 unsigned int temp;
-TCNT1 = T1_RELOAD; // перезагрузить таймер
+TCNT1 = T1_RELOAD; // РїРµСЂРµР·Р°РіСЂСѓР·РёС‚СЊ С‚Р°Р№РјРµСЂ
 temp = ADC;
 
 ADCSR |= (1<<ADSC);
@@ -179,15 +179,15 @@ if (temp > DACNoiseTreshold)
 	  Peak = 0;
 	  
 	  PlusSamplesCounter = 0;
-	  ResultSummReady = 1; // рапортуем об обрыве или повреждении
+	  ResultSummReady = 1; // СЂР°РїРѕСЂС‚СѓРµРј РѕР± РѕР±СЂС‹РІРµ РёР»Рё РїРѕРІСЂРµР¶РґРµРЅРёРё
 	  }
   }
 
   else 
-    { // считаем сколько нулевых семплов попалось
+    { // СЃС‡РёС‚Р°РµРј СЃРєРѕР»СЊРєРѕ РЅСѓР»РµРІС‹С… СЃРµРјРїР»РѕРІ РїРѕРїР°Р»РѕСЃСЊ
     ZeroSamplesCounter++;
     
-    if ((ZeroSamplesCounter > 20)&&(PlusSamplesCounter > 5)) // полуволна закончилась
+    if ((ZeroSamplesCounter > 20)&&(PlusSamplesCounter > 5)) // РїРѕР»СѓРІРѕР»РЅР° Р·Р°РєРѕРЅС‡РёР»Р°СЃСЊ
       {
       PeakResult = Peak;
       Peak = 0;
@@ -203,7 +203,7 @@ if (temp > DACNoiseTreshold)
       ZeroSamplesCounter = 0;
       
       PlusSamplesCounter = 0;
-      ResultSummReady = 1; // рапортуем, что напряжение пропало совсем
+      ResultSummReady = 1; // СЂР°РїРѕСЂС‚СѓРµРј, С‡С‚Рѕ РЅР°РїСЂСЏР¶РµРЅРёРµ РїСЂРѕРїР°Р»Рѕ СЃРѕРІСЃРµРј
       }
     }
 }
@@ -259,15 +259,15 @@ switch (code_state)
 #pragma vector = TIMER0_OVF0_vect 
 __interrupt void DynInd (void)
 {
-TCNT0 = T0_RELOAD; // перезагрузить таймер
+TCNT0 = T0_RELOAD; // РїРµСЂРµР·Р°РіСЂСѓР·РёС‚СЊ С‚Р°Р№РјРµСЂ
 
 if (cycle_count < NUMBER_DIGITS)
   {
-  PortKathode |= ((1<<Kathode_1) | (1<<Kathode_2) | (1<<Kathode_3)); //потушили все разряды
+  PortKathode |= ((1<<Kathode_1) | (1<<Kathode_2) | (1<<Kathode_3)); //РїРѕС‚СѓС€РёР»Рё РІСЃРµ СЂР°Р·СЂСЏРґС‹
   PortAnode &= ~((1<<SEG_A)|(1<<SEG_B)|(1<<SEG_C)|(1<<SEG_D)|(1<<SEG_E)|(1<<SEG_F)|(1<<SEG_G)|(1<<SEG_DP));
 
-  PortAnode = VideoBuffer[cycle_count]; // выдать новые значения для анодов
-  PortKathode &= ~ArrayKathodes[cycle_count];// включить катод
+  PortAnode = VideoBuffer[cycle_count]; // РІС‹РґР°С‚СЊ РЅРѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ Р°РЅРѕРґРѕРІ
+  PortKathode &= ~ArrayKathodes[cycle_count];// РІРєР»СЋС‡РёС‚СЊ РєР°С‚РѕРґ
   }
 
 if (++cycle_count >= NUMBER_DIGITS) cycle_count=0;
@@ -275,7 +275,7 @@ if (++cycle_count >= NUMBER_DIGITS) cycle_count=0;
 
 void KeyboardThread (void)
 {
-if (cycle_count == 2) // проверяем левую кнопку
+if (cycle_count == 2) // РїСЂРѕРІРµСЂСЏРµРј Р»РµРІСѓСЋ РєРЅРѕРїРєСѓ
   {
   if (!(PinButton & (1<<Button_DN))) {keypress[0]++; KeyTimer = KeyTimerMax;}
   else 
@@ -285,7 +285,7 @@ if (cycle_count == 2) // проверяем левую кнопку
     }
   }
 
-if (cycle_count == 0) // проверяем правую кнопку
+if (cycle_count == 0) // РїСЂРѕРІРµСЂСЏРµРј РїСЂР°РІСѓСЋ РєРЅРѕРїРєСѓ
   {
   if (!(PinButton & (1<<Button_UP))) {keypress[1]++; KeyTimer = KeyTimerMax;}
   else 
@@ -295,14 +295,14 @@ if (cycle_count == 0) // проверяем правую кнопку
     }
   }
 
-if (keypress[1] == 0) // была нажата кнопка ВНИЗ
+if (keypress[1] == 0) // Р±С‹Р»Р° РЅР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р’РќРР—
 {
   if (keypress[0] == midpress) {  keypress[0] = midpress+5;  PressProcessing(DN_MID);  }
   if (keypress[0] > longpress) {  keypress[0] = longpress+5; } 
-  if ((keypress[0] == 0)&&(KeyTimer)) KeyTimer--; // или не нажаты обе кнопки
+  if ((keypress[0] == 0)&&(KeyTimer)) KeyTimer--; // РёР»Рё РЅРµ РЅР°Р¶Р°С‚С‹ РѕР±Рµ РєРЅРѕРїРєРё
 }
 
-if (keypress[0] == 0) // была нажата кнопка ВВЕРХ
+if (keypress[0] == 0) // Р±С‹Р»Р° РЅР°Р¶Р°С‚Р° РєРЅРѕРїРєР° Р’Р’Р•Р РҐ
 {
   if (keypress[1] == midpress) {  keypress[1] = midpress+5;  PressProcessing(UP_MID);  }  
   if (keypress[1] > longpress) {  keypress[1] = longpress+5; }
@@ -324,8 +324,8 @@ InitPorts ();
 InitTimers ();
 InitADC ();
 LoadSettings ();
-ProtectTimerOnValue = ProtectTimerOnMaxValue;	//таймер включения после провалов взведен
-//ProtectTimerOffValue = ProtectTimerOffMaxValue; // таймер выключения при неглубоких провалах взведен
+ProtectTimerOnValue = ProtectTimerOnMaxValue;	//С‚Р°Р№РјРµСЂ РІРєР»СЋС‡РµРЅРёСЏ РїРѕСЃР»Рµ РїСЂРѕРІР°Р»РѕРІ РІР·РІРµРґРµРЅ
+//ProtectTimerOffValue = ProtectTimerOffMaxValue; // С‚Р°Р№РјРµСЂ РІС‹РєР»СЋС‡РµРЅРёСЏ РїСЂРё РЅРµРіР»СѓР±РѕРєРёС… РїСЂРѕРІР°Р»Р°С… РІР·РІРµРґРµРЅ
 __watchdog_init ();
 __enable_interrupt();
 
@@ -341,14 +341,14 @@ __enable_interrupt();
     Voltage = (unsigned int)temp;
     }
     
-    //быстрая защита
+    //Р±С‹СЃС‚СЂР°СЏ Р·Р°С‰РёС‚Р°
     if ( (Voltage > UpTreshold) || ((Voltage < DownTreshold)&& (Voltage < FastProtectVoltageTreshold)) ) ProtectTimerOnValue = ProtectTimerOnMaxValue; //
     
-    //медленная защита  
+    //РјРµРґР»РµРЅРЅР°СЏ Р·Р°С‰РёС‚Р°  
 	if  ((Voltage < DownTreshold) && (Voltage >= FastProtectVoltageTreshold)) 
 		{
-        if (ProtectTimerOnValue) ProtectTimerOffValue=0; // если уже и так выключено - сразу сгоняем таймер выключения в 0
-		if (ProtectTimerOffValue) ProtectTimerOffValue--; // тикает таймер выключения
+        if (ProtectTimerOnValue) ProtectTimerOffValue=0; // РµСЃР»Рё СѓР¶Рµ Рё С‚Р°Рє РІС‹РєР»СЋС‡РµРЅРѕ - СЃСЂР°Р·Сѓ СЃРіРѕРЅСЏРµРј С‚Р°Р№РјРµСЂ РІС‹РєР»СЋС‡РµРЅРёСЏ РІ 0
+		if (ProtectTimerOffValue) ProtectTimerOffValue--; // С‚РёРєР°РµС‚ С‚Р°Р№РјРµСЂ РІС‹РєР»СЋС‡РµРЅРёСЏ
 		}
 		else ProtectTimerOffValue = ProtectTimerOffMaxValue;
 	if (ProtectTimerOffValue == 0) ProtectTimerOnValue = ProtectTimerOnMaxValue;
@@ -362,12 +362,12 @@ __enable_interrupt();
     if ((DisplayMode == ProtectTimer)&&((ProtectTimerOnValue == ProtectTimerOnMaxValue) || (ProtectTimerOnValue == 0))) DisplayMode = RealtimeVoltage;
     if ((DisplayMode == RealtimeVoltage)&&(ProtectTimerOnValue == (ProtectTimerOnMaxValue - 1))) DisplayMode = ProtectTimer;
     
-    if (QuarterSecPrescaler++ > 10)    //раз в четверть секунды сюда заходим
+    if (QuarterSecPrescaler++ > 10)    //СЂР°Р· РІ С‡РµС‚РІРµСЂС‚СЊ СЃРµРєСѓРЅРґС‹ СЃСЋРґР° Р·Р°С…РѕРґРёРј
       {
       QuarterSecPrescaler = 0;
       DisplayedVoltage = Voltage;
-      if ((ProtectTimerOnValue)&&(DisplayMode == RealtimeVoltage)) EnableDisplay += 128; // мигаем экраном
-        else EnableDisplay = 128; // не мигаем
+      if ((ProtectTimerOnValue)&&(DisplayMode == RealtimeVoltage)) EnableDisplay += 128; // РјРёРіР°РµРј СЌРєСЂР°РЅРѕРј
+        else EnableDisplay = 128; // РЅРµ РјРёРіР°РµРј
       }
   
     if (SecPrescaler++>90)
